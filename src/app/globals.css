@@ -61,9 +61,86 @@
 
 @layer base {
   * {
-    @apply border-border;
+    /* border-border: equivalent to hsl(var(--border)) */
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #F8F9FA;
+    color: #212529;
+    font-size: 16px;
+    line-height: 1.6;
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
   }
+  .dark body {
+    background-color: #121212;
+    color: #E9ECEF;
+  }
+}
+
+/* Force dark mode readability for elements styled with explicit light-theme text colors */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #FFFFFF !important;
+}
+
+.dark .text-black,
+.dark .text-neutral-950,
+.dark .text-neutral-900,
+.dark .text-neutral-800 {
+  color: #E9ECEF !important;
+}
+
+.dark .text-neutral-500,
+.dark .text-neutral-400 {
+  color: #A3A3A3 !important;
+}
+
+.dark .text-neutral-600 {
+  color: #C0C0C0 !important;
+}
+
+.dark .text-white {
+  color: #FFFFFF !important;
+}
+
+.dark hr {
+  border-color: #262626 !important;
+}
+
+/* High contrast primary theme colors for light/dark mode text readability */
+.text-primary-500 {
+  color: #0d9488 !important; /* teal-600 for light mode */
+}
+.dark .text-primary-500 {
+  color: #00ffc7 !important; /* neon mint for dark mode */
+}
+.border-primary-500 {
+  border-color: #0d9488 !important;
+}
+.dark .border-primary-500 {
+  border-color: #00ffc7 !important;
+}
+.bg-primary-500\/10 {
+  background-color: rgba(13, 148, 136, 0.1) !important;
+}
+.dark .bg-primary-500\/10 {
+  background-color: rgba(0, 255, 199, 0.1) !important;
+}
+.bg-primary-500\/20 {
+  background-color: rgba(13, 148, 136, 0.2) !important;
+}
+.dark .bg-primary-500\/20 {
+  background-color: rgba(0, 255, 199, 0.2) !important;
+}
+
+/* Protect high contrast text on bright background buttons/badges/icons in dark mode */
+.dark .bg-primary-500,
+.dark .bg-primary-500 * {
+  color: #0a0a0a !important;
+}
+
+.dark .dark\:text-neutral-950,
+.dark [class*="dark:text-neutral-950"] {
+  color: #0a0a0a !important;
 }

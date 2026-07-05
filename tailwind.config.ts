@@ -22,10 +22,12 @@ const config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          500: '#00ffc7',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+          500: '#ffc700',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
@@ -38,6 +40,7 @@ const config = {
         accent: {
           DEFAULT: 'hsl(var(--accent))',
           foreground: 'hsl(var(--accent-foreground))',
+          500: '#c700ff',
         },
         popover: {
           DEFAULT: 'hsl(var(--popover))',
