@@ -1,15 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: 'https://parking-prac.vercel.app/',
-  generateRobotsTxt: true,
-  robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: '*',
-        allow: '/',
-      },
-    ],
-  },
+  generateRobotsTxt: false,
   outDir: './public',
   // 추가 설정을 원하시면 아래 주석을 해제하고 수정하세요
   // changefreq: 'daily',
