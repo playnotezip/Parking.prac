@@ -14,7 +14,7 @@ export default function Home() {
   
   // Stats states
   const [personalStats, setPersonalStats] = useState({ totalPlays: 0, totalTimeSeconds: 0 });
-  const [globalStats, setGlobalStats] = useState({ totalPlays: 1280, avgTimeSeconds: 92 });
+  const [globalStats, setGlobalStats] = useState({ totalPlays: 0, avgTimeSeconds: 0 });
   const [loading, setLoading] = useState(true);
 
   // Load user session
@@ -39,7 +39,7 @@ export default function Home() {
         .select('elapsed_time_seconds, user_id');
 
       let dbGlobalCount = 0;
-      let dbGlobalAvg = 92;
+      let dbGlobalAvg = 0;
 
       if (globalData && globalData.length > 0) {
         // Filter out current user's data from global stats
@@ -55,7 +55,7 @@ export default function Home() {
       }
 
       setGlobalStats({
-        totalPlays: 1280 + dbGlobalCount, // base cumulative + actual DB entries
+        totalPlays: dbGlobalCount, // actual DB entries
         avgTimeSeconds: dbGlobalAvg
       });
 
