@@ -29,6 +29,10 @@ export default function Home() {
   // Main fetch function for statistics
   const fetchStats = async () => {
     try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUser = session?.user ?? null;
+
       // 1. Fetch Global Stats from Supabase
       const { data: globalData, error: globalErr } = await supabase
         .from('parking_histories')
@@ -38,9 +42,16 @@ export default function Home() {
       let dbGlobalAvg = 92;
 
       if (globalData && globalData.length > 0) {
-        dbGlobalCount = globalData.length;
-        const totalSec = globalData.reduce((acc, h) => acc + (h.elapsed_time_seconds || 0), 0);
-        dbGlobalAvg = Math.round(totalSec / dbGlobalCount);
+        // Filter out current user's data from global stats
+        const otherUsersData = currentUser
+          ? globalData.filter((h) => h.user_id !== currentUser.id)
+          : globalData;
+
+        dbGlobalCount = otherUsersData.length;
+        if (dbGlobalCount > 0) {
+          const totalSec = otherUsersData.reduce((acc, h) => acc + (h.elapsed_time_seconds || 0), 0);
+          dbGlobalAvg = Math.round(totalSec / dbGlobalCount);
+        }
       }
 
       setGlobalStats({
@@ -49,9 +60,6 @@ export default function Home() {
       });
 
       // 2. Fetch Personal Stats
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUser = session?.user ?? null;
-
       if (currentUser) {
         // Fetch personal stats from DB
         const { data: personalData } = await supabase

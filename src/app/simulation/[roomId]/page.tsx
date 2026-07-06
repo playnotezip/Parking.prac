@@ -68,6 +68,12 @@ export default function RoomPage({ params }: RoomPageProps) {
     router.push('/simulation');
   };
 
+  const handleRetry = () => {
+    setIsModalOpen(false);
+    setIsReplayActive(false);
+    canvasRef.current?.reset();
+  };
+
   const handleStartReplay = () => {
     setIsModalOpen(false);
     setIsReplayActive(true);
@@ -141,6 +147,7 @@ export default function RoomPage({ params }: RoomPageProps) {
         isSuccess={results.isSuccess}
         onClose={handleCloseModal}
         onReplay={handleStartReplay}
+        onRetry={handleRetry}
       />
     </div>
   );

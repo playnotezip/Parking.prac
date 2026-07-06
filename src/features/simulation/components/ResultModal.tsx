@@ -32,6 +32,7 @@ interface ResultModalProps {
   isSuccess: boolean;
   onClose: () => void;
   onReplay: () => void;
+  onRetry: () => void;
 }
 
 export default function ResultModal({
@@ -47,6 +48,7 @@ export default function ResultModal({
   isSuccess,
   onClose,
   onReplay,
+  onRetry,
 }: ResultModalProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -309,7 +311,7 @@ export default function ResultModal({
               리플레이 보기
             </Button>
             <Button
-              onClick={onClose}
+              onClick={onRetry}
               variant="outline"
               className="flex-1 gap-2 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-950 text-neutral-800 dark:text-white"
             >

@@ -124,6 +124,7 @@ export default function MyPage() {
           const { data, error } = await supabase
             .from('parking_histories')
             .select('*')
+            .eq('user_id', currentUser.id)
             .order('created_at', { ascending: false });
 
           if (error) throw error;

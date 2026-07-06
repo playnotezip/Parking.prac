@@ -111,7 +111,7 @@ export default function SimulatorCanvas({
 
     if (mapId === 'rear' || modeId === 'tutorial') {
       const targetX = modeId === 'tutorial' ? 450 : 400;
-      const targetY = modeId === 'tutorial' ? 480 : 475;
+      const targetY = modeId === 'tutorial' ? 480 : 445;
       const slotWidth = carWidth + 14;
 
       const indices = [-3, -2, -1, 1, 2, 3];
@@ -120,14 +120,14 @@ export default function SimulatorCanvas({
       });
 
       // 왼쪽(지도 상단)에도 주차 차량들을 꽉 채워서 대칭적으로 추가
-      const targetYTop = modeId === 'tutorial' ? 120 : 125;
+      const targetYTop = modeId === 'tutorial' ? 120 : 155;
       for (let idx = -3; idx <= 3; idx++) {
         cars.push(makeRandomCar(`rear_top_parked_${idx}`, { x: targetX + idx * slotWidth, y: targetYTop }, Math.PI / 2));
       }
     } else if (mapId === 'front') {
       const targetX = 450;
-      const targetY = 475;
-      const targetYTop = 125;
+      const targetY = 445;
+      const targetYTop = 155;
       const slotWidth = carWidth + 12;
 
       const indices = [-3, -2, -1, 1, 2, 3];
@@ -229,6 +229,17 @@ export default function SimulatorCanvas({
     let startY = 300; // 양쪽 주차 구역의 정중앙선 지점
     let startAngle = 0; // 오른쪽 방향 정방향 응시
 
+    if (modeId === 'tutorial') {
+      startX = 150;
+      startY = 300;
+      startAngle = 0;
+    } else {
+      if (mapId === 'rear') { startX = 150; startY = 300; startAngle = 0; }
+      else if (mapId === 'front') { startX = 200; startY = 300; startAngle = 0; }
+      else if (mapId === 'parallel') { startX = 150; startY = 320; startAngle = 0; }
+      else if (mapId === 'diagonal') { startX = 150; startY = 300; startAngle = 0; }
+    }
+
     initRandomParkedCars(carType);
 
     stateRef.current = {
@@ -292,8 +303,8 @@ export default function SimulatorCanvas({
     const carWidth = carConfig.width / 50;
 
     const defaultWalls: Obstacle[] = [
-      { id: 'wall_top', box: { center: { x: 400, y: 15 }, w: 800, h: 30, angle: 0 }, color: '#333b47' },
-      { id: 'wall_bottom', box: { center: { x: 400, y: 585 }, w: 800, h: 30, angle: 0 }, color: '#333b47' },
+      { id: 'wall_top', box: { center: { x: 400, y: 40 }, w: 800, h: 30, angle: 0 }, color: '#333b47' },
+      { id: 'wall_bottom', box: { center: { x: 400, y: 560 }, w: 800, h: 30, angle: 0 }, color: '#333b47' },
       { id: 'wall_left', box: { center: { x: 15, y: 300 }, w: 30, h: 600, angle: 0 }, color: '#333b47' },
       { id: 'wall_right', box: { center: { x: 785, y: 300 }, w: 30, h: 600, angle: 0 }, color: '#333b47' },
     ];
@@ -310,6 +321,14 @@ export default function SimulatorCanvas({
         isCar: true
       };
     });
+
+    // If tutorial mode, enforce default tutorial layout and ignore mapId
+    if (modeId === 'tutorial') {
+      return [
+        ...defaultWalls,
+        ...dynamicObstacles,
+      ];
+    }
 
     if (mapId === 'rear' && modeId !== 'tutorial') {
       return [
@@ -365,15 +384,15 @@ export default function SimulatorCanvas({
       return { center: { x: 450, y: 480 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'T-park' };
     }
     if (mapId === 'rear') {
-      return { center: { x: 400, y: 475 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'T-park' };
+      return { center: { x: 400, y: 445 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'T-park' };
     } else if (mapId === 'front') {
-      return { center: { x: 450, y: 475 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'front' };
+      return { center: { x: 450, y: 445 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'front' };
     } else if (mapId === 'parallel') {
       return { center: { x: 500, y: 390 }, w: slotW + 12, h: slotH, angle: 0, type: 'parallel' };
     } else if (mapId === 'diagonal') {
       return { center: { x: 450, y: 430 }, w: slotW, h: slotH, angle: Math.PI / 4, type: 'diagonal' as any };
     }
-    return { center: { x: 400, y: 475 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'T-park' };
+    return { center: { x: 400, y: 445 }, w: slotW, h: slotH, angle: Math.PI / 2, type: 'T-park' };
   };
 
   // Math Helpers for OBB Box calculation (Separating Axis Theorem)
@@ -386,7 +405,7 @@ export default function SimulatorCanvas({
       { x: box.center.x + halfW * c - halfH * s, y: box.center.y + halfW * s + halfH * c },
       { x: box.center.x - halfW * c - halfH * s, y: box.center.y - halfW * s + halfH * c },
       { x: box.center.x - halfW * c + halfH * s, y: box.center.y - halfW * s - halfH * c },
-      { x: box.center.x + halfW * c + halfH * s, y: box.center.y + halfW * s + halfH * c },
+      { x: box.center.x + halfW * c + halfH * s, y: box.center.y + halfW * s - halfH * c },
     ];
   };
 
@@ -543,8 +562,24 @@ export default function SimulatorCanvas({
         angle: targetSlot.angle,
       };
       const allCornersIn = corners.every((pt) => isPointInOBB(pt, slotBox));
-      const angleDiff = Math.abs(Math.sin(state.angle - targetSlot.angle));
-      const aligned = angleDiff < 0.087; // approx 5 degrees
+      
+      let targetHeading = targetSlot.angle;
+      if (modeId === 'tutorial' || mapId === 'rear') {
+        targetHeading = -Math.PI / 2; // rear park (facing up/out)
+      } else if (mapId === 'front') {
+        targetHeading = Math.PI / 2;  // front park (facing down/in)
+      } else if (mapId === 'parallel') {
+        targetHeading = 0;            // facing right
+      } else if (mapId === 'diagonal') {
+        targetHeading = Math.PI / 4;  // facing down-right
+      }
+
+      let diff = (state.angle - targetHeading) % (Math.PI * 2);
+      if (diff > Math.PI) diff -= Math.PI * 2;
+      if (diff < -Math.PI) diff += Math.PI * 2;
+      
+      const angleDiff = diff;
+      const aligned = Math.abs(angleDiff) < 0.087; // approx 5 degrees
 
       if (collisionCooldown > 0) collisionCooldown--;
 
@@ -832,7 +867,7 @@ export default function SimulatorCanvas({
               let finalScore = Math.max(10, 100 - collisionPenalty - linePenalty - timePenalty + timeBonus);
               if (finalScore > 100) finalScore = 100;
 
-              const finalAngleOffset = (Math.asin(angleDiff) * 180) / Math.PI;
+              const finalAngleOffset = (Math.abs(angleDiff) * 180) / Math.PI;
 
               onComplete({
                 score: finalScore,
@@ -913,7 +948,7 @@ export default function SimulatorCanvas({
 
         if (mapId === 'rear' || modeId === 'tutorial') {
           const drawSlotsX = modeId === 'tutorial' ? 450 : 400;
-          const drawSlotsY = modeId === 'tutorial' ? 480 : 475;
+          const drawSlotsY = modeId === 'tutorial' ? 480 : 445;
           const slotWidth = carWidth + 14;
           const slotW = carLength + 8;
           
@@ -931,7 +966,7 @@ export default function SimulatorCanvas({
           renderCtx.stroke();
 
           // 상단(왼쪽) 주차 구역선 대칭적으로 그리기
-          const drawSlotsYTop = modeId === 'tutorial' ? 120 : 125;
+          const drawSlotsYTop = modeId === 'tutorial' ? 120 : 155;
           for (let i = -3.5; i <= 3.5; i++) {
             const lx = drawSlotsX + i * slotWidth;
             renderCtx.beginPath();
@@ -945,8 +980,8 @@ export default function SimulatorCanvas({
           renderCtx.stroke();
         } else if (mapId === 'front') {
           const drawSlotsX = 450;
-          const drawSlotsY = 475;
-          const drawSlotsYTop = 125;
+          const drawSlotsY = 445;
+          const drawSlotsYTop = 155;
           const slotWidth = carWidth + 12;
           const slotW = carLength + 8;
           
@@ -1470,7 +1505,7 @@ export default function SimulatorCanvas({
     externalRef.current = {
       reset: () => {
         let startX = 150;
-        let startY = 250;
+        let startY = 300;
         let startAngle = 0;
 
         if (modeId === 'tutorial') {
@@ -1479,8 +1514,9 @@ export default function SimulatorCanvas({
           startAngle = 0;
         } else {
           if (mapId === 'rear') { startX = 150; startY = 300; startAngle = 0; }
-          else if (mapId === 'front') { startX = 200; startY = 400; startAngle = 0; }
+          else if (mapId === 'front') { startX = 200; startY = 300; startAngle = 0; }
           else if (mapId === 'parallel') { startX = 150; startY = 320; startAngle = 0; }
+          else if (mapId === 'diagonal') { startX = 150; startY = 300; startAngle = 0; }
         }
 
         stateRef.current = {
@@ -1544,7 +1580,7 @@ export default function SimulatorCanvas({
       <div className="w-full max-w-[800px] flex items-center justify-between px-2 text-sm text-neutral-400">
         <div className="flex gap-4 items-center">
           <span>
-            ⏱ 시간: <strong className="text-neutral-900 dark:text-white">{elapsedTime}초</strong>
+            ⏱ 시간: <strong className="text-white">{elapsedTime}초</strong>
           </span>
           
           {/* Display Hearts / Lives for Survival and Hard modes */}
