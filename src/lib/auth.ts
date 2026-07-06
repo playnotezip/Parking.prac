@@ -29,6 +29,15 @@ export const authOptions: NextAuthOptions = {
           throw new Error(error?.message || "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
 
+        // Write login history log to Supabase
+        try {
+          await supabase.from("login_histories").insert({
+            user_id: data.user.id,
+          });
+        } catch (dbErr) {
+          console.error("Failed to save login history log:", dbErr);
+        }
+
         return {
           id: data.user.id,
           email: data.user.email,
