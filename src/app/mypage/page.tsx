@@ -26,6 +26,7 @@ interface ParkingHistoryItem {
   id: string;
   car_type: string;
   map_id: string;
+  mode_id?: string;
   elapsed_time_seconds: number;
   collision_count: number;
   line_violation_seconds: number;
@@ -61,6 +62,20 @@ export default function MyPage() {
     alleyway: '비좁은 골목길 주차',
   };
 
+  const modeNames: Record<string, string> = {
+    tutorial: '입문 튜토리얼',
+    practice: '자유 연습 모드',
+    survival: '서바이벌 모드',
+    hard: '하드 모드',
+  };
+
+  const getModeBadgeColor = (m: string) => {
+    if (m === 'tutorial') return 'bg-primary-500/10 text-primary-500 border-primary-500/30';
+    if (m === 'survival') return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+    if (m === 'hard') return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
+    return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'; // practice
+  };
+
   const getScoreGradeColor = (s: number) => {
     if (s >= 90) return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
     if (s >= 75) return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
@@ -80,6 +95,7 @@ export default function MyPage() {
         user_id: userId,
         car_type: item.car_type,
         map_id: item.map_id,
+        mode_id: item.mode_id || 'practice',
         elapsed_time_seconds: item.elapsed_time_seconds,
         collision_count: item.collision_count,
         line_violation_seconds: item.line_violation_seconds,
@@ -342,6 +358,11 @@ export default function MyPage() {
                           <Badge variant="outline" className="text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800">
                             {carNames[item.car_type] || item.car_type}
                           </Badge>
+                          {item.mode_id && (
+                            <Badge variant="outline" className={`font-semibold rounded-full text-xs px-2 py-0.5 ${getModeBadgeColor(item.mode_id)}`}>
+                              {modeNames[item.mode_id] || item.mode_id}
+                            </Badge>
+                          )}
                         </div>
                         <p className="text-xs text-neutral-500">{formattedDate}</p>
                       </div>

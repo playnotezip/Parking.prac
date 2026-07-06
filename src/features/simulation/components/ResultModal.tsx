@@ -117,6 +117,7 @@ export default function ResultModal({
         const record = {
           car_type: carType,
           map_id: mapId,
+          mode_id: modeId,
           elapsed_time_seconds: elapsedTimeSeconds,
           collision_count: collisionCount,
           line_violation_seconds: lineViolationDurationSeconds,
