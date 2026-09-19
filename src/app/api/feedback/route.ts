@@ -68,7 +68,9 @@ export async function POST(req: NextRequest) {
       finalAngleOffsetDegree,
     } = body;
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const baseUrl = process.env.OMNIROUTE_BASE_URL ?? 'http://localhost:20128/v1';
+    const apiKey = process.env.OMNIROUTE_API_KEY ?? process.env.OPENAI_API_KEY;
+    const model = process.env.FEEDBACK_MODEL ?? 'gpt-4o-mini';
 
     if (!apiKey) {
       // Fallback to local rule-based coaching
@@ -83,15 +85,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ feedback, provider: 'local-rule-engine' });
     }
 
-    // Call OpenAI API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call OmniRoute gateway (OpenAI-compatible); falls back to local rules on failure
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model,
         messages: [
           {
             role: 'system',
@@ -117,7 +119,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      console.warn('OpenAI API status not ok, falling back to local rules');
+      console.warn('OmniRoute status not ok, falling back to local rules');
       const feedback = generateLocalFeedback(
         carType,
         mapId,
@@ -131,7 +133,7 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     const feedback = data.choices?.[0]?.message?.content?.trim() || '';
-    return NextResponse.json({ feedback, provider: 'openai' });
+    return NextResponse.json({ feedback, provider: model });
   } catch (err: any) {
     console.error('Error generating feedback:', err);
     return NextResponse.json(
